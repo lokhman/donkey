@@ -1,0 +1,83 @@
+#!/bin/bash
+
+if [ $UID -ne 0 ]; then
+  echo -e "\e[31mERROR: \e[0mDonkey daemon should be run as \e[1mroot\e[0m"
+  exit 1
+fi
+
+help () {
+  echo -e "\e[34mUsage: \e[0m\e[1m$0 \e[0m\e[33m{start|stop|restart|status}\e[0m"
+  exit 1
+}
+
+ROOT=`dirname $0`/..
+DIR=`readlink -e $ROOT`
+
+DAEMON_USER="pi"
+DAEMON_GROUP="pi"
+
+DONKEY=$DIR/app.py
+DONKEY_PORT=8080
+DONKEY_NAME=donkey
+DONKEY_DESC=Donkey
+DONKEY_OPTS="--port=$DONKEY_PORT"
+DONKEY_PID=/var/run/$DONKEY_NAME.pid
+
+CPULIMIT=/usr/bin/cpulimit
+CPULIMIT_NAME=cpulimit
+CPULIMIT_OPTS="-e lame -l 75"
+CPULIMIT_PID=/var/run/$CPULIMIT_NAME.pid
+
+. /lib/lsb/init-functions
+
+do_start () {
+  nc -z -w5 127.0.0.1 $DONKEY_PORT
+  if [ $? -eq 0 ]; then
+    echo -e "\e[31mERROR: \e[0mPort \e[1m$DONKEY_PORT \e[0mis currently busy"
+    exit 1
+  fi
+
+  log_daemon_msg "Starting system $DONKEY_DESC daemon"
+  start-stop-daemon --start --background --pidfile $DONKEY_PID --make-pidfile \
+    --user $DAEMON_USER --group $DAEMON_GROUP --chuid $DAEMON_USER \
+    --chdir $DIR --name $DONKEY_NAME --startas $DONKEY -- $DONKEY_OPTS
+  log_end_msg $?
+  
+  log_daemon_msg "Starting system $CPULIMIT_NAME daemon"
+  start-stop-daemon --start --background --pidfile $CPULIMIT_PID --make-pidfile \
+    --name $CPULIMIT_NAME --startas $CPULIMIT -- $CPULIMIT_OPTS
+  log_end_msg $?
+}
+
+do_stop () {
+  log_daemon_msg "Stopping system $DONKEY_DESC daemon"
+  start-stop-daemon --stop --pidfile $DONKEY_PID --retry 10
+  rm -f $DONKEY_PID
+  log_end_msg $?
+  
+  log_daemon_msg "Stopping system $CPULIMIT_NAME daemon"
+  start-stop-daemon --stop --pidfile $CPULIMIT_PID --retry 10
+  rm -f $CPULIMIT_PID
+  log_end_msg $?
+}
+
+case "$1" in
+  start|stop)
+    do_${1}
+    ;;
+
+  restart|reload|force-reload)
+    do_stop
+    do_start
+    ;;
+
+  status)
+    status_of_proc -p $DONKEY_PID $DONKEY "$DONKEY_DESC" && exit 0 || exit $?
+    ;;
+
+  *)
+    help
+    ;;
+esac
+
+exit 0
