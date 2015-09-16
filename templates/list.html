@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+
+{% block title %}Songs{% end %}
+{% block subtitle %}{% if user %}{{ user.name }}{% end %}{% end %}
+
+{% block article %}
+<section id="_list">
+    {% if len(songs) %}
+        <div class="list-group">
+            {% for i, song in enumerate(songs) %}
+                <a{% if current_user.is_admin %} href="/songs/{{ song.get('id') }}"{% end %} class="list-group-item{% if not song.get('enabled') %} disabled{% end %}">
+                    {{ str(i + 1).zfill(len(str(len(songs)))) }}.
+                    <strong>{{ song.get('artist') }}</strong> &mdash; {{ song.get('title') }}
+                    <span class="badge">{{ datetime.timedelta(milliseconds=song.get('length')) }}</span>
+                </a>
+            {% end %}
+        </div>
+    {% else %}
+        <p>No songs uploaded</p>
+    {% end %}
+</section>
+{% end %}

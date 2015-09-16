@@ -1,0 +1,94 @@
+{% extends 'base.html' %}
+
+{% block title %}Welcome {{ current_user.name.split(' ')[0] }}{% end %}
+
+{% block article %}
+<section id="_main" class="row">
+    <div class="col-md-9">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <table class="player">
+                <tr>
+                    <td class="player-controls">
+                        <a class="player-prev btn btn-sm btn-default" title="Backward">
+                            <i class="glyphicon glyphicon-step-backward"></i>
+                        </a>
+                        <a class="player-play btn btn-sm btn-default" title="Play">
+                            <i class="glyphicon glyphicon-play"></i>
+                        </a>
+                        <a class="player-pause btn btn-sm btn-default" title="Pause">
+                            <i class="glyphicon glyphicon-pause"></i>
+                        </a>
+                        <a class="player-stop btn btn-sm btn-default" title="Stop">
+                            <i class="glyphicon glyphicon-stop"></i>
+                        </a>
+                        <a class="player-next btn btn-sm btn-default" title="Forward">
+                            <i class="glyphicon glyphicon-step-forward"></i>
+                        </a>
+                    </td>
+                    <td class="player-position"><input type="text"></td>
+                    <td class="player-time bg-warning"><samp class="inverted">--:--</samp></td>
+                    <td class="player-volume"><input type="text"></td>
+                </tr>
+                </table>
+            </div>
+            <div class="playlist list-group"></div>
+            <div class="panel-footer">
+                <a class="playlist-focus btn btn-default btn-xs">
+                    <i class="glyphicon glyphicon-screenshot"></i>
+                    Focus
+                </a>
+                <a class="playlist-refresh btn btn-default btn-xs">
+                    <i class="glyphicon glyphicon-refresh"></i>
+                    Refresh
+                </a>
+                {% if current_user.is_admin %}
+                    <a class="playlist-shuffle btn btn-default btn-xs">
+                        <i class="glyphicon glyphicon-random"></i>
+                        Shuffle
+                    </a>
+                {% end %}
+                <span class="pull-right">
+                    <abbr class="sys-cpu" title="CPU">0.0%</abbr> &bull;
+                    <abbr class="sys-mem" title="Memory">0.0%</abbr> &bull;
+                    <abbr class="sys-disk" title="Free HDD space">{{ disk }}</abbr> &bull;
+                    <abbr class="total-time" title="Total songs time">0:00:00</abbr>
+                </span>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <i class="glyphicon glyphicon-user"></i>
+                Users
+                {% if current_user.is_admin %}
+                    <a href="/users" target="_blank" class="btn btn-success btn-xs pull-right" title="New user">
+                        <i class="glyphicon glyphicon-plus"></i>
+                    </a>
+                {% end %}
+            </div>
+            <ul class="users list-group">
+                {% for user in users %}
+                    <li class="list-group-item" data-login="{{ user.login }}">
+                        {% if user.is_admin %}<strong>{% end %}
+                        {% if current_user.is_admin %}
+                            <a href="/users/{{ user.login }}" target="_blank">
+                                {{ user.name }}
+                            </a>
+                        {% else %}
+                            {{ user.name }}
+                        {% end %}
+                        {% if user.is_admin == 1 %}</strong>{% end %}
+                        <span class="label label-success hidden">AIR</span>
+                        <a href="/list?user={{ user.login }}" target="_blank" class="badge"
+                            title="{{ user.uploaded }}&nbsp;song{{ '' if user.uploaded == 1 else 's' }}&nbsp;uploaded
+                            {{ user.disabled }}&nbsp;song{{ '' if user.disabled == 1 else 's' }}&nbsp;disabled
+                            ({{ round(float(user.disabled) * 100 / (user.uploaded or 1), 1) }}%)">{{ user.uploaded }}</a>
+                    </li>
+                {% end %}
+            </ul>
+        </div>
+    </div>
+</section>
+{% end %}

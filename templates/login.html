@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+
+{% block title %}Login{% end %}
+
+{% block article %}
+<div class="row">
+    <div class="col-md-4 col-md-push-4">
+        <div class="panel panel-default">
+            <form method="POST" class="panel-body">
+                {% module xsrf_form_html() %}
+
+                <div class="form-group">
+                    <label for="form_login">Login:</label>
+                    <input type="text" id="form_login" name="login" value="{{ handler.get_argument('user', '') }}" class="form-control" max-length="32" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="form_password">Password:</label>
+                    <input type="password" id="form_password" name="password" class="form-control" max-length="255">
+                </div>
+
+                <input type="submit" value="Sign in" class="btn btn-primary">
+            </form>
+        </div>
+    </div>
+</div>
+{% end %}

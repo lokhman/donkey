@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+
+{% block title %}Users{% end %}
+
+{% block article %}
+<section id="_user">
+    <form method="POST">
+        <div class="row">
+            <div class="col-md-5">
+                <div class="form-group">
+                    <label>Login:</label>
+                    {% if user.login %}
+                        <p class="form-control-static">{{ user.login }}</p>
+                    {% else %}
+                        <input type="text" name="login" value="{{ user.login }}" class="form-control" max-length="32" placeholder="login" required onchange="this.value=this.value.toLowerCase();">
+                    {% end %}
+                </div>
+                <div class="form-group">
+                    <label>Password:</label>
+                    <input type="password" name="password" class="form-control" max-length="32" placeholder="password"{% if not user.login %} required{% end %}>
+                </div>
+                <div class="form-group">
+                    <label>Name:</label>
+                    <input type="text" name="name" value="{{ user.name }}" class="form-control" max-length="32" placeholder="Alex Lokhman II" required>
+                </div>
+                <div class="form-group">
+                    <div class="checkbox">
+                        <label>
+                            <input type="checkbox" name="is_admin"{% if user.is_admin %} checked{% end %}>
+                            Administrator
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="well">
+            {% module xsrf_form_html() %}
+            <button type="submit" class="btn btn-primary">
+                <i class="glyphicon glyphicon-save"></i> Save
+            </button>
+            {% if user.login and user.login != current_user.login %}
+                <button type="submit" name="delete" class="btn btn-danger pull-right"
+                    onclick="return confirm('Do you really want to remove the user?');">
+                    <i class="glyphicon glyphicon-remove"></i> Delete
+                </button>
+            {% end %}
+        </div>
+    </form>
+</section>
+{% end %}

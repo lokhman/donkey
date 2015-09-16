@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+
+{% block title %}Upload MP3{% end %}
+
+{% block article %}
+<section id="_upload">
+    <blockquote style="font-size: 100%;">
+        <p>
+            By uploading any songs to Dancing Donkey you accept the following
+            <a class="pointer" data-toggle="modal" data-target="#about">Terms and Conditions</a>:
+        </p>
+        <ol>
+            <li>Please pick good tracks only. There is no need to dump an entire album onto the system when some of the tracks are inevitably rubbish.</li>
+            <li>Please limit music you feel the room will not like to a minimum, but the odd track here and there is fine.</li>
+            <li>Generally music should be background music that is easy to work to.</li>
+            <li>No shouting, screaming, or screeching that could be considered uncomfortable listening.</li>
+            <li>No tracks from the film Tron, or any other fear inducing sounds.</li>
+            <li>No rap music of any description.</li>
+            <li>No Kayne West.</li>
+        </ol>
+        <footer>Administrator</footer>
+    </blockquote>
+
+    <form method="POST" enctype="multipart/form-data">
+        <ul class="upload-container tiles clearfix">
+            <li class="upload-item">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        Song #<span class="upload-index">1</span>
+                        <a class="close hidden upload-remove">&times;</a>
+                    </div>
+                    <div class="panel-body">
+                        <div class="form-group">
+                            <label>Artist:</label>
+                            <input type="text" name="artist[]" class="form-control" max-length="64" placeholder="Iron Maiden" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Title:</label>
+                            <input type="text" name="titles[]" class="form-control" max-length="128" placeholder="Fear of the Dark" required>
+                        </div>
+                        <div class="form-group">
+                            <label>MP3 file (*.mp3):</label>
+                            <input type="file" name="mp3[]" class="form-control" required>
+                        </div>
+                    </div>
+                </div>
+            </li>
+        </ul>
+        <div class="well">
+            {% module xsrf_form_html() %}
+            <a class="upload-add btn btn-default">
+                <i class="glyphicon glyphicon-plus"></i> Add Another MP3
+            </a>
+            <button type="submit" class="btn btn-primary pull-right">
+                <i class="glyphicon glyphicon-upload"></i> Upload
+            </button>
+        </div>
+    </form>
+</section>
+{% end %}

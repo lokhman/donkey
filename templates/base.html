@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="author" content="Alex Lokhman II">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}{% end %} &mdash; Donkey {{ handler.application.version }}</title>
+    <link rel="stylesheet" href="{{ static_url('vendor/bootstrap-3.3.1/css/bootstrap.min.css') }}">
+    <link rel="stylesheet" href="{{ static_url('vendor/bootstrap-3.3.1/css/bootstrap-theme.min.css') }}">
+    <link rel="stylesheet" href="{{ static_url('vendor/bootstrap-slider-3.1.0/dist/css/bootstrap-slider.min.css') }}">
+    <link rel="stylesheet" href="{{ static_url('css/styles.css') }}">
+
+    <link rel="apple-touch-icon" sizes="57x57" href="{{ static_url('apple-touch-icon-57x57.png') }}">
+    <link rel="apple-touch-icon" sizes="114x114" href="{{ static_url('apple-touch-icon-114x114.png') }}">
+    <link rel="apple-touch-icon" sizes="72x72" href="{{ static_url('apple-touch-icon-72x72.png') }}">
+    <link rel="apple-touch-icon" sizes="144x144" href="{{ static_url('apple-touch-icon-144x144.png') }}">
+    <link rel="apple-touch-icon" sizes="60x60" href="{{ static_url('apple-touch-icon-60x60.png') }}">
+    <link rel="apple-touch-icon" sizes="120x120" href="{{ static_url('apple-touch-icon-120x120.png') }}">
+    <link rel="apple-touch-icon" sizes="76x76" href="{{ static_url('apple-touch-icon-76x76.png') }}">
+    <link rel="apple-touch-icon" sizes="152x152" href="{{ static_url('apple-touch-icon-152x152.png') }}">
+    <link rel="icon" type="image/png" href="{{ static_url('favicon-196x196.png') }}" sizes="196x196">
+    <link rel="icon" type="image/png" href="{{ static_url('favicon-160x160.png') }}" sizes="160x160">
+    <link rel="icon" type="image/png" href="{{ static_url('favicon-96x96.png') }}" sizes="96x96">
+    <link rel="icon" type="image/png" href="{{ static_url('favicon-16x16.png') }}" sizes="16x16">
+    <link rel="icon" type="image/png" href="{{ static_url('favicon-32x32.png') }}" sizes="32x32">
+    <link rel="icon" type="image/x-icon" href="{{ static_url('favicon.ico') }}">
+    <meta name="msapplication-TileColor" content="#da532c">
+    <meta name="msapplication-TileImage" content="{{ static_url('mstile-144x144.png') }}">
+    <script>
+        var server = {
+            version: {{ handler.application.version }},
+            uptime: {{ (datetime.datetime.now() - handler.application.uptime).total_seconds() }},
+            wso: {% raw json_encode(handler.application.wso.commands()) %}
+        };
+        {% if current_user %}
+            server.is_admin = {{ int(current_user.is_admin) }};
+        {% end %}
+    </script>
+</head>
+<body>
+    <nav class="navbar navbar-default navbar-static-top">
+        <div class="container">
+            <div class="navbar-header">
+                <a href="/" class="navbar-brand">
+                    Donkey {{ handler.application.version }}
+                </a>
+            </div>
+            {% if current_user %}
+                <ul class="navbar-nav nav">
+                    <li{% if handler.request.path == '/upload' %} class="active"{% end %}>
+                        <a href="/upload">
+                            <i class="glyphicon glyphicon-upload"></i>
+                            Upload MP3
+                        </a>
+                    </li>
+                    <li>
+                        <a class="pointer" data-toggle="modal" data-target="#about">
+                            <i class="glyphicon glyphicon-music"></i>
+                            About
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/logout">
+                            <i class="glyphicon glyphicon-off"></i>
+                            Logout
+                        </a>
+                    </li>
+                </ul>
+            {% end %}
+            <p class="navbar-text navbar-right">
+                <i class="glyphicon glyphicon-time"></i>
+                <span class="uptime help" title="Server uptime" data-placement="bottom"></span>
+            </p>
+        </div>
+    </nav>
+
+    <main class="container">
+        <header class="page-header">
+            <h1>
+                {% block title %}{{ handler.request.host }}{% end %}
+                <small>{% block subtitle %}{% end %}</small>
+            </h1>
+        </header>
+
+        {% for message, status in handler.alerts %}
+            <div class="alert alert-{{ status }} alert-dismissible">
+                <a class="close" data-dismiss="alert">&times;</a>
+                <strong>{{ status.upper() }}:</strong> {{ message }}
+            </div>
+        {% end %}
+
+        <article>
+            {% block article %}{% end %}
+            <div class="loader"></div>
+        </article>
+    </main>
+
+    <div class="modal fade" id="about" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <a class="close" data-dismiss="modal">&times;</a>
+                    <h4 class="modal-title">Welcome to Dancing Donkey</h4>
+                </div>
+                <div class="modal-body">
+                    <p>The music system for the people, by the people. (But with added elements of a dictatorship where necessary.)</p>
+                    <p>All users are encouraged to upload their favourite tracks. A wide range of music is tolerated, in fact the more the varied the better, but please think about the other listeners before overwhelming the room with hundreds of screaming death metal tracks all at the same time.</p>
+                    <p>By using this system you hereby agree to not upload any terrible music. This includes, but is not limited to, Kayne West and all rap music.</p>
+                </div>
+                <div class="modal-footer">
+                    <small class="pull-left" style="margin-top: 8px;">
+                        &copy; Alexander Lokhman {{ datetime.date.today().year }}
+                    </small>
+                    <a class="btn btn-primary" data-dismiss="modal">OK</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ static_url('vendor/jquery-2.1.1/jquery-2.1.1.min.js') }}"></script>
+    <script src="{{ static_url('vendor/bootstrap-3.3.1/js/bootstrap.min.js') }}"></script>
+    <script src="{{ static_url('vendor/bootstrap-slider-3.1.0/dist/bootstrap-slider.min.js') }}"></script>
+    <script src="{{ static_url('vendor/bootstrap-growl-1.1.0/jquery.bootstrap-growl.min.js') }}"></script>
+    <script src="{{ static_url('vendor/sortable-0.1.9/Sortable.min.js') }}"></script>
+    <script src="{{ static_url('js/scripts.js') }}"></script>
+</body>
+</html>
