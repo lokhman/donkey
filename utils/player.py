@@ -120,8 +120,8 @@ class Player(object):
         try:
             self._audio.write(buf)
         except:
-            _ao_init()
-            _ao_write(buf)
+            self._ao_init()
+            self._ao_write(buf)
 
     def _wait(self, callback):
         if self._thread:
